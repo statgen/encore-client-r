@@ -1,0 +1,23 @@
+Package: encore
+Type: Package
+Title: Client to interact with the Encore analysis server
+Version: 0.1.0
+Authors@R: 
+    c(person(given = "Matthew",
+             family = "Flickinger",
+             role = c("aut", "cre"),
+             email = "mflick@umich.edu"))
+Description: Allows you to interact with an Encore analysis server
+    directly from R.
+License: AGPL-3
+Encoding: UTF-8
+LazyData: true
+Depends:
+    R (>= 4.0)
+Imports:
+    httr (>= 0.5),
+    rlang (>= 0.4)
+Suggests:
+    ggplot2,
+    rstudioapi
+RoxygenNote: 7.1.0
