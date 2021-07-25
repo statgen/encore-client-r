@@ -11,7 +11,7 @@ plot_manhattan(
   scale_x = TRUE,
   scale_y = TRUE,
   scale_color = TRUE,
-  theme = ggplot2::theme_bw(),
+  theme = theme_manhattan(),
   token = get_current_access_token()
 )
 }

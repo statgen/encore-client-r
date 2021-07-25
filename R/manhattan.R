@@ -52,6 +52,7 @@ get_job_manhattan_data <- function(job, token=get_current_access_token()) {
   chr_len <- (sapply(chr_ranges, max) - chr_start)/1e6
   chr_offset <- c(0, head(cumsum(chr_len+5),-1))
   chr_centers <- chr_len/2 + chr_offset
+  chr_breaks <- chr_offset[-1]
   names(chr_offset) <- names(chr_len)
   gen_pos <- function(chrom, pos) {
     pos/1e6 - chr_start[chrom] + chr_offset[chrom]
@@ -80,7 +81,7 @@ get_job_manhattan_data <- function(job, token=get_current_access_token()) {
 
   x <- list(unbinned = unbinned,
        binned_points=binned_points, binned_lines=binned_lines,
-       chr_centers=chr_centers)
+       chr_centers=chr_centers, chr_breaks = chr_breaks)
   attr(x, "job_id") <- job_id
   class(x) <- "encore_manhattan_data"
   x
@@ -172,7 +173,7 @@ plot_manhattan <- function(job,
   palette = c("#7878ba", "#000042"),
   sig_line = 5e-8,
   scale_x = TRUE, scale_y = TRUE, scale_color = TRUE,
-  theme = ggplot2::theme_bw(),
+  theme = theme_manhattan(),
   token = get_current_access_token()) {
 
 
@@ -233,11 +234,12 @@ plot_manhattan <- function(job,
     }} +
     {if ((is.logical(scale_x) && scale_x) || is.function(scale_x)) {
       breaks <- data$chr_centers
+      minor_breaks <- data$chr_breaks
       labels <- names(data$chr_centers)
       guide <- ggplot2::guide_axis(n.dodge = 2)
       expand <- ggplot2::expansion(0,20)
       fun <- if (is.function(scale_x)) scale_x else function(data, ...) ggplot2::scale_x_continuous(...)
-      fun(data, breaks=breaks, labels=labels, guide=guide, expand=expand)
+      fun(data, breaks=breaks, minor_breaks=minor_breaks, labels=labels, guide=guide, expand=expand)
     } else if (is.logical(scale_x) && !scale_x) {
       NULL
     } else {
@@ -247,3 +249,21 @@ plot_manhattan <- function(job,
     theme
 }
 
+#' Manhattan plot theme
+#'
+#' Default ggplot2 theme for Manhattan plot
+#'
+#' This uses the black and white ggplot theme and
+#' turns off the grid lines for the chromosome
+#' centers (major breaks)
+#'
+#' @param ... Values passed along to the ggplot::theme() function
+#' @param panel.grid.major Styling chromosome center grid marks
+#'
+#' @return A ggplot2 object
+#' @export
+
+theme_manhattan <- function(..., panel.grid.major = ggplot2::element_blank()) {
+  ggplot2::theme_bw(...) +
+  ggplot2::theme(panel.grid.major = panel.grid.major)
+}
