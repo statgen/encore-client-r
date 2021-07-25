@@ -165,7 +165,7 @@ get_job_manhattan_data <- function(job, token=get_current_access_token()) {
 #'   scale_x = function(data, ..., labels, guide) {
 #'    # remove "chr" from chromosome names
 #'    # and turn off dodging (by ignoring the altered guide= param)
-#'    scale_x_continuous(..., labels=gsub("chr","", labels))
+#'    ggplot2::scale_x_continuous(..., labels=gsub("chr","", labels))
 #' })
 #' }
 plot_manhattan <- function(job,
@@ -215,7 +215,7 @@ plot_manhattan <- function(job,
         palette <- rep(palette, length.out = nlevels(data$unbinned$chrom))
       }
       fun <- if (is.function(scale_color)) scale_color else function(data, ...) ggplot2::scale_color_manual(...)
-      fun(data, guide = FALSE, breaks=breaks, values = palette)
+      fun(data, guide = "none", breaks=breaks, values = palette)
     } else if (is.logical(scale_color) && !scale_color) {
       NULL
     } else {

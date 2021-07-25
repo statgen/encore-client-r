@@ -98,7 +98,7 @@ plot_manhattan(job_id,
   scale_x = function(data, ..., labels, guide) {
    # remove "chr" from chromosome names
    # and turn off dodging (by ignoring the altered guide= param)
-   scale_x_continuous(..., labels=gsub("chr","", labels))
+   ggplot2::scale_x_continuous(..., labels=gsub("chr","", labels))
 })
 }
 }
