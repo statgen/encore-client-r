@@ -6,8 +6,7 @@
 \alias{encore-package}
 \title{encore: Client to interact with the Encore analysis server}
 \description{
-Allows you to interact with an Encore analysis server
-    directly from R.
+Allows you to interact with an Encore analysis server directly from R.
 }
 \author{
 \strong{Maintainer}: Matthew Flickinger \email{mflick@umich.edu}

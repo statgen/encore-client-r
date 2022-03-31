@@ -49,11 +49,42 @@ eGET <- function(path, token, ...) {
   }
   resp
 }
+
 eHEAD <- function(path, token, ...) {
   url <- paste0(get_encore_server(), path)
   resp <- httr::HEAD(url,
             httr::add_headers("Authorization"=paste("Bearer", token)),
             ...)
+  if(httr::status_code(resp) == 401) {
+    stop(paste("Unauthorized request.",
+               "Try refreshing your API access token. See ?set_access_token"))
+  }
+  resp
+}
+
+flatform <- function(x) {
+  # A form can only have one value per name, so take
+  # any values that contain vectors length >1 and
+  # split them up
+  # list(x=1:2, y="a") becomes list(x=1, x=2, y="a")
+  lens <- lengths(x)
+  if (all(lens<=1)) return(x);
+  z <- do.call("c", lapply(x, as.list))
+  names(z) <- rep(names(x), lens)
+  z
+}
+
+ePOST <- function(path, token, body=NULL, encode="flatform", ...) {
+  url <- paste0(get_encore_server(), path)
+  if (encode == "flatform") {
+    body <- flatform(body)
+    encode <- "form"
+  }
+  resp <- httr::POST(url,
+                     httr::add_headers("Authorization"=paste("Bearer", token)),
+                     body = body,
+                     encode = encode,
+                     ...)
   if(httr::status_code(resp) == 401) {
     stop(paste("Unauthorized request.",
                "Try refreshing your API access token. See ?set_access_token"))

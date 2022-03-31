@@ -18,23 +18,39 @@
 #' }
 
 get_job_details <- function(job, token=get_current_access_token()) {
-  reset_details <- function(params) {
-    names(params)[names(params)=="name"] <- "job_name"
-    names(params)[names(params)=="type"] <- "model"
-    params <- params[-which(names(params) %in% c("user_id", "variant_filter_desc",
-                                                 "pipeline_version", "model_desc"))]
-    params$covariates <- unlist(params$covariates)
-    params$genopheno <- unlist(params$genopheno)
-    params
+  if (("encore_job") %in% class(job)) {
+    return(job)
+  }
+  clean <- function(x) {
+    # rename
+    from_name <- c("name", "type")
+    to_name <- c("job_name", "model")
+    for (i in seq_along(from_name)) {
+      from <- from_name[i]
+      to <- to_name[i]
+      if(from %in% names(x$details)) {
+        names(x$details)[names(x$details)==from] <- to
+      }
+    }
+    # unlist
+    for (v in c("covariates", "genopheno")) {
+      if (v %in% names(x$details) && is.list(x$details[[v]])) {
+        x$details[[v]] <- unlist(x$details[[v]])
+      }
+    }
+    x
   }
   job_id <- get_job_id(job)
+  if (length(job_id) != 1) {
+    stop(paste("Expected 1 job ID, found", length(job_id)))
+  }
   api_path <- paste0("/api/jobs/", job_id)
   resp <- eGET(api_path, token)
   if(httr::status_code(resp) != 200) {
     stop("Request Error", httr::content(resp))
   }
   result <- httr::content(resp)
-  result$request <- reset_details(result$details)
+  result <- clean(result)
   class(result) <- "encore_job"
   result
 }
@@ -73,4 +89,3 @@ get_jobs <- function(search=NULL, limit=200, token=get_current_access_token()) {
   class(x) <- c("encore_job_list", class(x))
   x
 }
-
