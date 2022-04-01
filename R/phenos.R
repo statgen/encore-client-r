@@ -1,3 +1,39 @@
+
+#' Get phenotype details
+#'
+#' Returns metadata for phenotype file
+#'
+#' @param pheno A phenotype ID string (UUID)
+#' @param token An Encore API access token
+#'
+#' @return A object of class "encore_phenotype"
+#' @export
+#'
+#' @seealso \code{\link{get_phenotypes}}
+#'
+#' @examples
+#' \dontrun{
+#' pheno_id <- "123e4567-e89b-12d3-a456-426652340000"
+#' get_phenotype_details(pheno_id)
+#' }
+get_phenotype_details <- function(pheno, token = get_current_access_token()) {
+  if (("encore_phenotype") %in% class(pheno)) {
+    return(pheno)
+  }
+  pheno_id <- get_phenotype_id(pheno)
+  if (length(pheno_id) != 1) {
+    stop(paste("Expected 1 phenotype ID, found", length(pheno_id)))
+  }
+  api_path <- paste0("/api/phenos/", pheno_id)
+  resp <- eGET(api_path, token)
+  if(httr::status_code(resp) != 200) {
+    stop("Request Error", httr::content(resp))
+  }
+  result <- httr::content(resp)
+  class(result) <- "encore_phenotype"
+  result
+}
+
 #' Get phenotype list
 #'
 #' Return a list of all your phenotype files
@@ -27,16 +63,4 @@ get_phenotypes <- function(search=NULL, limit=200, token=get_current_access_toke
   x <- make_data_frame(result)
   class(x) <- c("encore_pheno_list", class(x))
   x
-}
-
-upload_phenotype <- function(pheno_path, token=get_current_access_token()) {
-  stopifnot(file.exists(pheno_path))
-  api_url <- paste0(get_encore_server(), "/api/phenos")
-  resp <- httr::POST(api_url,
-              httr::add_headers("Authorization"=paste("Bearer", token)),
-              body = list(pheno_file = httr::upload_file(pheno_path)))
-  if(httr::status_code(resp) != 200) {
-    stop("Request Error", httr::content(resp))
-  }
-  httr::content(resp)$pheno_id
 }
