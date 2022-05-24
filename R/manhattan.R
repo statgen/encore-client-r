@@ -34,7 +34,7 @@ get_job_manhattan_data <- function(job, token=get_current_access_token()) {
   }
   data <- httr::content(resp)
 
-  unbinned <- type.convert(do.call("rbind.data.frame", data$unbinned_variants), as.is=TRUE)
+  unbinned <- type.convert(rbind_fill(data$unbinned_variants), as.is=TRUE)
 
   bin_prop <- do.call("rbind.data.frame", lapply(data$variant_bins, function(x) {
     data.frame(chrom=x$chrom, pos=x$pos,

@@ -19,6 +19,18 @@ make_data_frame <- function(data, header=NULL) {
   x
 }
 
+rbind_fill <- function(dflist) {
+  # an inefficient version of dplyr::bind_rows but used here so
+  # as to not require dplyr as a depenency
+  lens <- lengths(dflist)
+  if (any(lens != lens[1])) {
+    full_cols <- unique(unlist(lapply(dflist, names)))
+    base_row <- setNames(replicate(length(full_cols), NA, simplify=FALSE), full_cols)
+    dflist <- lapply(dflist, function(x) { modifyList(base_row, x) })
+  }
+  do.call("rbind.data.frame", dflist)
+}
+
 ## Helper functions for paged results
 has_next <- function(x) {
   next_page <- attr(x, "next_page")
