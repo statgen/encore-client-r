@@ -38,7 +38,7 @@ get_job_qq_data <- function(job, index, token=get_current_access_token()) {
   clean_layer_data <- function(x) {
     binned <- do.call("rbind.data.frame", x$variant_bins)
     names(binned) <- c("expected","observed")
-    unbinned <- type.convert(do.call("rbind.data.frame", lapply(x$unbinned_variants, function(z) c(list(expected=z[[1]], observed=z[[2]]), z[[3]]))), as.is=TRUE)
+    unbinned <- type.convert(rbind_fill(lapply(x$unbinned_variants, function(z) c(list(expected=z[[1]], observed=z[[2]]), z[[3]]))), as.is=TRUE)
     extra_cols <- setdiff(names(unbinned), names(binned))
     binned[, extra_cols] <- rep(list(NA), length(extra_cols))
     binned$binned <- TRUE
