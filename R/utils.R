@@ -81,7 +81,7 @@ flattenbody <- function(x) {
   # list(x=1:2, y="a") becomes list(x=1, x=2, y="a")
   if (all(lengths(x)<=1)) return(x);
   do.call("c", mapply(function(name, val) {
-    if (length(val)==1 || c("form_file", "form_data") %in% class(val)) {
+    if (length(val)==1 || any(c("form_file", "form_data") %in% class(val))) {
       x <- list(val)
       names(x) <- name
       x
